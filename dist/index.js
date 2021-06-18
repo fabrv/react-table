@@ -19,6 +19,14 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
 var TableComponent = /*#__PURE__*/function (_Component) {
   _inheritsLoose(TableComponent, _Component);
 
@@ -26,20 +34,37 @@ var TableComponent = /*#__PURE__*/function (_Component) {
     var _this;
 
     _this = _Component.call(this, props) || this;
-    _this.keys = _this.props.keys ? _this.props.keys : Object.keys(_this.props.data[0]);
+    _this.filterValues = {};
+    _this.columns = _this.columnsObject(_this.props.columns, _this.props.data);
     _this.pages = typeof _this.props.pages === 'number' ? _this.props.pages : 0;
+    _this.handleFilter = _this.handleFilter.bind(_assertThisInitialized(_this));
     return _this;
   }
 
   var _proto = TableComponent.prototype;
 
   _proto.componentDidUpdate = function componentDidUpdate(prevProps) {
-    if (prevProps.keys !== this.props.keys) {
-      this.keys = this.props.keys ? this.props.keys : Object.keys(this.props.data[0]);
+    if (prevProps.columns !== this.props.columns) {
+      this.columns = this.columnsObject(this.props.columns, this.props.data);
     }
 
     if (prevProps.pages !== this.props.pages) {
       this.pages = typeof this.props.pages === 'number' ? this.props.pages : 0;
+    }
+  };
+
+  _proto.columnsObject = function columnsObject(prop, data) {
+    var obj = prop || Object.keys(data[0]);
+
+    if (typeof obj[0] === 'string') {
+      return obj.map(function (column) {
+        return {
+          caption: column,
+          filterComponent: null
+        };
+      });
+    } else {
+      return obj;
     }
   };
 
@@ -54,8 +79,6 @@ var TableComponent = /*#__PURE__*/function (_Component) {
     if (this.props.onCellClick) {
       this.props.onCellClick(payload);
     }
-
-    return payload;
   };
 
   _proto.handlePageClick = function handlePageClick(page) {
@@ -76,20 +99,31 @@ var TableComponent = /*#__PURE__*/function (_Component) {
     }
   };
 
+  _proto.handleFilter = function handleFilter(value, id) {
+    this.filterValues[id] = {
+      value: value
+    };
+    console.log(this.filterValues);
+  };
+
   _proto.render = function render() {
     var _this2 = this;
 
     return /*#__PURE__*/React__default.createElement("div", null, /*#__PURE__*/React__default.createElement("table", {
       className: this.props.className,
       style: this.props.style
-    }, /*#__PURE__*/React__default.createElement("thead", null, /*#__PURE__*/React__default.createElement("tr", null, this.keys.map(function (key, index) {
+    }, /*#__PURE__*/React__default.createElement("thead", null, /*#__PURE__*/React__default.createElement("tr", null, this.columns.map(function (column, index) {
       return /*#__PURE__*/React__default.createElement("th", {
         onClick: function onClick(e) {
-          return _this2.handleCellClick(0, index, key, e.target);
+          return _this2.handleCellClick(0, index, column.caption, e.target);
         },
         key: index,
         scope: "col"
-      }, key);
+      }, column.caption, column.filterComponent ? /*#__PURE__*/React__default.createElement(column.filterComponent, {
+        setFilter: function setFilter(value) {
+          _this2.handleFilter(value, column.filterId || 'search');
+        }
+      }) : null);
     }))), /*#__PURE__*/React__default.createElement("tbody", null, this.props.data.map(function (val) {
       return Object.values(val);
     }).map(function (row, rIndex) {

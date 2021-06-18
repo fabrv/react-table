@@ -1,24 +1,36 @@
 import React, { Component } from 'react'
 
 export class TableComponent extends Component {
+  filterValues = {}
+
   constructor(props) {
     super(props)
 
-    this.keys = this.props.keys
-      ? this.props.keys
-      : Object.keys(this.props.data[0])
+    this.columns = this.columnsObject(this.props.columns, this.props.data)
 
     this.pages = typeof this.props.pages === 'number' ? this.props.pages : 0
+
+    this.handleFilter = this.handleFilter.bind(this)
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.keys !== this.props.keys) {
-      this.keys = this.props.keys
-        ? this.props.keys
-        : Object.keys(this.props.data[0])
+    if (prevProps.columns !== this.props.columns) {
+      this.columns = this.columnsObject(this.props.columns, this.props.data)
     }
     if (prevProps.pages !== this.props.pages) {
       this.pages = typeof this.props.pages === 'number' ? this.props.pages : 0
+    }
+  }
+
+  columnsObject(prop, data) {
+    const obj = prop || Object.keys(data[0])
+    if (typeof obj[0] === 'string') {
+      return obj.map((column) => ({
+        caption: column,
+        filterComponent: null
+      }))
+    } else {
+      return obj
     }
   }
 
@@ -33,7 +45,6 @@ export class TableComponent extends Component {
     if (this.props.onCellClick) {
       this.props.onCellClick(payload)
     }
-    return payload
   }
 
   handlePageClick(page) {
@@ -54,19 +65,35 @@ export class TableComponent extends Component {
     }
   }
 
+  handleFilter(value, id) {
+    this.filterValues[id] = {
+      value: value
+    }
+    console.log(this.filterValues)
+  }
+
   render() {
     return (
       <div>
         <table className={this.props.className} style={this.props.style}>
           <thead>
             <tr>
-              {this.keys.map((key, index) => (
+              {this.columns.map((column, index) => (
                 <th
-                  onClick={(e) => this.handleCellClick(0, index, key, e.target)}
+                  onClick={(e) =>
+                    this.handleCellClick(0, index, column.caption, e.target)
+                  }
                   key={index}
                   scope='col'
                 >
-                  {key}
+                  {column.caption}
+                  {column.filterComponent ? (
+                    <column.filterComponent
+                      setFilter={(value) => {
+                        this.handleFilter(value, column.filterId || 'search')
+                      }}
+                    />
+                  ) : null}
                 </th>
               ))}
             </tr>

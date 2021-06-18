@@ -1,6 +1,26 @@
 import React, { Component } from "react";
 import { TableComponent } from "react-table";
 
+const textFilter = (props) => {
+  return (
+    <input 
+      className="form-select" 
+      style={{width: '100%'}} 
+      onChange={(e) => props.setFilter(e.target.value)}/>
+  )
+}
+
+const selectFilter = (props, options) => (
+  <select 
+    className="form-select" 
+    style={{width: '100%'}} 
+    onChange={(e) => props.setFilter(e.target.value)}
+  >
+    <option defaultValue></option>
+    {options.map((option, index) => <option key={index} value={index}>{option}</option>)}
+  </select>
+)
+
 export default class TestComponent extends Component {
   data = [
     {
@@ -49,7 +69,23 @@ export default class TestComponent extends Component {
       nationality: 'Korea'
     }
   ]
-  keys = ['ID', 'Name', 'Nationality']
+  columns = [
+    {
+      caption: 'ID',
+      filterComponent: textFilter,
+      filterId: 'id'
+    },
+    {
+      caption: 'Name',
+      filterComponent: textFilter,
+      filterId: 'name'
+    },
+    {
+      caption: 'Nationality',
+      filterComponent: (props) => selectFilter(props, this.data.map(a => a.nationality).filter((v, i, a) => a.indexOf(v) === i)),
+      filterId: 'nationality'
+    }
+  ]
   
   state = {
     data: this.data.slice(0, 3),
@@ -81,12 +117,11 @@ export default class TestComponent extends Component {
         onPreviousPageClick={() => this.previousPage()}
         onPageClick={(e) => this.pageChange(e)}
         className='table' 
-        data={this.state.data} 
-        keys={this.keys}
+        data={this.state.data}
+        columns={this.columns}
         pagination={true}
         showNext={this.state.page > 0 && this.state.page < 3}
         showPrevious={this.state.page > 1 && this.state.page < 4}
-        pages={Math.ceil(this.data.length / 3)}
       />
       </div>
     )

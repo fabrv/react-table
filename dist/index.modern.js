@@ -3,17 +3,32 @@ import React, { Component } from 'react';
 class TableComponent extends Component {
   constructor(props) {
     super(props);
-    this.keys = this.props.keys ? this.props.keys : Object.keys(this.props.data[0]);
+    this.filterValues = {};
+    this.columns = this.columnsObject(this.props.columns, this.props.data);
     this.pages = typeof this.props.pages === 'number' ? this.props.pages : 0;
+    this.handleFilter = this.handleFilter.bind(this);
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.keys !== this.props.keys) {
-      this.keys = this.props.keys ? this.props.keys : Object.keys(this.props.data[0]);
+    if (prevProps.columns !== this.props.columns) {
+      this.columns = this.columnsObject(this.props.columns, this.props.data);
     }
 
     if (prevProps.pages !== this.props.pages) {
       this.pages = typeof this.props.pages === 'number' ? this.props.pages : 0;
+    }
+  }
+
+  columnsObject(prop, data) {
+    const obj = prop || Object.keys(data[0]);
+
+    if (typeof obj[0] === 'string') {
+      return obj.map(column => ({
+        caption: column,
+        filterComponent: null
+      }));
+    } else {
+      return obj;
     }
   }
 
@@ -28,8 +43,6 @@ class TableComponent extends Component {
     if (this.props.onCellClick) {
       this.props.onCellClick(payload);
     }
-
-    return payload;
   }
 
   handlePageClick(page) {
@@ -50,15 +63,26 @@ class TableComponent extends Component {
     }
   }
 
+  handleFilter(value, id) {
+    this.filterValues[id] = {
+      value: value
+    };
+    console.log(this.filterValues);
+  }
+
   render() {
     return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("table", {
       className: this.props.className,
       style: this.props.style
-    }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, this.keys.map((key, index) => /*#__PURE__*/React.createElement("th", {
-      onClick: e => this.handleCellClick(0, index, key, e.target),
+    }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, this.columns.map((column, index) => /*#__PURE__*/React.createElement("th", {
+      onClick: e => this.handleCellClick(0, index, column.caption, e.target),
       key: index,
       scope: "col"
-    }, key)))), /*#__PURE__*/React.createElement("tbody", null, this.props.data.map(val => Object.values(val)).map((row, rIndex) => /*#__PURE__*/React.createElement("tr", {
+    }, column.caption, column.filterComponent ? /*#__PURE__*/React.createElement(column.filterComponent, {
+      setFilter: value => {
+        this.handleFilter(value, column.filterId || 'search');
+      }
+    }) : null)))), /*#__PURE__*/React.createElement("tbody", null, this.props.data.map(val => Object.values(val)).map((row, rIndex) => /*#__PURE__*/React.createElement("tr", {
       key: rIndex
     }, row.map((cell, cIndex) => /*#__PURE__*/React.createElement("td", {
       onClick: e => this.handleCellClick(rIndex, cIndex, cell, e.target),
