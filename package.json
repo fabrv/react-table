@@ -1,9 +1,8 @@
 {
-  "name": "react-table",
+  "name": "minimal-react-table",
   "version": "1.0.0",
   "description": "Simple React Table with filtering, sorting and pagination",
-  "author": "fabrv",
-  "license": "MIT",
+  "author": "Fabrizio Delcompare",
   "repository": "fabrv/react-table",
   "main": "dist/index.js",
   "module": "dist/index.modern.js",

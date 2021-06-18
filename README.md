@@ -1,4 +1,4 @@
-# react-table
+# minimal-react-table
 
 > Simple React Table with filtering, sorting and pagination
 
@@ -7,7 +7,7 @@
 ## Install
 
 ```bash
-npm install --save react-table
+npm install --save minimal-react-table
 ```
 
 ## Usage
@@ -15,12 +15,14 @@ npm install --save react-table
 ```jsx
 import React, { Component } from 'react'
 
-import MyComponent from 'react-table'
-import 'react-table/dist/index.css'
+import TableComponent from 'react-table'
 
 class Example extends Component {
+  data = [{name: 'John Doe', age: 45}]
   render() {
-    return <MyComponent />
+    return <TableComponent
+      data={data}
+    />
   }
 }
 ```

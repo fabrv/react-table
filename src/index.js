@@ -10,9 +10,7 @@ export class TableComponent extends Component {
     super(props)
 
     this.columns = this.columnsObject(this.props.columns, this.props.data)
-
     this.pages = typeof this.props.pages === 'number' ? this.props.pages : 0
-
     this.handleFilter = this.handleFilter.bind(this)
   }
 

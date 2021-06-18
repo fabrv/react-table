@@ -161,20 +161,33 @@ export default class TestComponent extends Component {
   render() {
     return (
       <div>
-      <TableComponent 
-        onCellClick={(e) => console.log(e)}
-        onNextPageClick={() => this.nextPage()}
-        onPreviousPageClick={() => this.previousPage()}
-        onPageClick={(e) => this.pageChange(e)}
-        onFilterChange={(e) => this.filter(e)}
-        onSortChange={(e) => this.sort(e)}
-        className='table' 
-        data={this.state.data.slice((this.state.page - 1) * 3, (this.state.page - 1) * 3 + 3)}
-        columns={this.columns}
-        pagination={true}
-        showNext={this.state.page < Math.ceil(this.state.data.length/3)}
-        showPrevious={this.state.page > 1}
-      />
+        <h1>Minimal React Table</h1>
+        <h2>Full example</h2>
+        <TableComponent 
+          onCellClick={(e) => console.log(e)}
+          onNextPageClick={() => this.nextPage()}
+          onPreviousPageClick={() => this.previousPage()}
+          onPageClick={(e) => this.pageChange(e)}
+          onFilterChange={(e) => this.filter(e)}
+          onSortChange={(e) => this.sort(e)}
+          className='table' 
+          data={this.state.data.slice((this.state.page - 1) * 3, (this.state.page - 1) * 3 + 3)}
+          columns={this.columns}
+          pagination={true}
+          showNext={this.state.page < Math.ceil(this.state.data.length/3)}
+          showPrevious={this.state.page > 1}
+        />
+
+        <h2>Most basic example</h2>
+        <TableComponent
+          data={this.data}
+        />
+        
+        <h2>Basic example with column names</h2>
+        <TableComponent
+          columns={['ID', 'Name', 'Nationality']}
+          data={this.data}
+        />
       </div>
     )
   }
