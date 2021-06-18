@@ -103,7 +103,10 @@ var TableComponent = /*#__PURE__*/function (_Component) {
     this.filterValues[id] = {
       value: value
     };
-    console.log(this.filterValues);
+
+    if (this.props.onFilterChange) {
+      this.props.onFilterChange(this.filterValues);
+    }
   };
 
   _proto.render = function render() {

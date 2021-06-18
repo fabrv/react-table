@@ -17,61 +17,61 @@ const selectFilter = (props, options) => (
     onChange={(e) => props.setFilter(e.target.value)}
   >
     <option defaultValue></option>
-    {options.map((option, index) => <option key={index} value={index}>{option}</option>)}
+    {options.map((option, index) => <option key={index} value={option}>{option}</option>)}
   </select>
 )
 
 export default class TestComponent extends Component {
   data = [
     {
-      ID: '435132',
+      id: '435132',
       name: 'Fabrizio',
       nationality: 'Kazak'
     },
     {
-      ID: '897894',
+      id: '897894',
       name: 'John Doe',
       nationality: 'Brit'
     },
     {
-      ID: '909807',
+      id: '909807',
       name: 'Thom Peters',
       nationality: 'Scot'
     },
     {
-      ID: '198723',
+      id: '198723',
       name: 'Juan Perez',
       nationality: 'Mexico'
     },
     {
-      ID: '495963',
+      id: '495963',
       name: 'Mario Martinez',
       nationality: 'Spain'
     },
     {
-      ID: '3284994',
+      id: '3284994',
       name: 'Ho Chi',
       nationality: 'Vietnam'
     },
     {
-      ID: '198723',
+      id: '198723',
       name: 'Joao Da Silva',
       nationality: 'Portuguese'
     },
     {
-      ID: '495963',
+      id: '495963',
       name: 'Ngolo Kante',
       nationality: 'France'
     },
     {
-      ID: '3284994',
+      id: '3284994',
       name: 'Hojin Lee',
       nationality: 'Korea'
     }
   ]
   columns = [
     {
-      caption: 'ID',
+      caption: 'id',
       filterComponent: textFilter,
       filterId: 'id'
     },
@@ -88,24 +88,46 @@ export default class TestComponent extends Component {
   ]
   
   state = {
-    data: this.data.slice(0, 3),
+    data: this.data,
     page: 1
   }
 
   pageChange(page) {
-    const data = this.data.slice((page - 1) * 3, (page - 1) * 3 + 3)
     this.setState({
-      data: data,
       page: page
     })
   }
 
   nextPage() {
-    this.pageChange(this.state.page + 1)
+    this.setState({
+      page: this.state.page + 1
+    })
   }
 
   previousPage() {
-    this.pageChange(this.state.page - 1)
+    this.setState({
+      page: this.state.page - 1
+    })
+  }
+
+  filter(fields) {
+    fields = {
+      nationality: fields.nationality?.value || '',
+      name: fields.name?.value || '',
+      id: fields.id?.value || ''
+    }
+
+    const data = this.data.filter(row => {
+      return (
+        row.name.toLowerCase().indexOf(fields.name.toLowerCase()) !== -1 &&
+        row.id.toLowerCase().indexOf(fields.id.toLowerCase()) !== -1 &&
+        (fields.nationality === '' || row.nationality === fields.nationality)
+      )
+    })
+
+    this.setState({
+      data: data
+    })
   }
 
   render() {
@@ -116,12 +138,13 @@ export default class TestComponent extends Component {
         onNextPageClick={() => this.nextPage()}
         onPreviousPageClick={() => this.previousPage()}
         onPageClick={(e) => this.pageChange(e)}
+        onFilterChange={(e) => this.filter(e)}
         className='table' 
-        data={this.state.data}
+        data={this.state.data.slice((this.state.page - 1) * 3, (this.state.page - 1) * 3 + 3)}
         columns={this.columns}
         pagination={true}
-        showNext={this.state.page > 0 && this.state.page < 3}
-        showPrevious={this.state.page > 1 && this.state.page < 4}
+        showNext={this.state.page < Math.ceil(this.state.data.length/3)}
+        showPrevious={this.state.page > 1}
       />
       </div>
     )

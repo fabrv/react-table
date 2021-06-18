@@ -67,7 +67,10 @@ class TableComponent extends Component {
     this.filterValues[id] = {
       value: value
     };
-    console.log(this.filterValues);
+
+    if (this.props.onFilterChange) {
+      this.props.onFilterChange(this.filterValues);
+    }
   }
 
   render() {
