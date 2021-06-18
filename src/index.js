@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 
 export class TableComponent extends Component {
   filterValues = {}
+  state = {
+    sortValues: {}
+  }
 
   constructor(props) {
     super(props)
@@ -75,6 +78,20 @@ export class TableComponent extends Component {
     }
   }
 
+  handleSort(id) {
+    const val = this.state.sortValues[id]?.value
+    const sortValue = {}
+    sortValue[id] = { value: val ? (val + 1) % 3 : 1 }
+
+    this.setState({
+      sortValues: sortValue
+    })
+
+    if (this.props.onSortChange) {
+      this.props.onSortChange(sortValue)
+    }
+  }
+
   render() {
     return (
       <div>
@@ -83,17 +100,26 @@ export class TableComponent extends Component {
             <tr>
               {this.columns.map((column, index) => (
                 <th
-                  onClick={(e) =>
+                  onClick={(e) => {
                     this.handleCellClick(0, index, column.caption, e.target)
-                  }
+                  }}
                   key={index}
                   scope='col'
                 >
-                  {column.caption}
+                  <span
+                    onClick={(_) => {
+                      if (column.sortable) this.handleSort(column.id)
+                    }}
+                    style={column.sortable ? { cursor: 'pointer' } : null}
+                  >
+                    {column.caption}
+                  </span>
+                  {this.state.sortValues[column.id]?.value === 1 ? ' ▴' : null}
+                  {this.state.sortValues[column.id]?.value === 2 ? ' ▾' : null}
                   {column.filterComponent ? (
                     <column.filterComponent
                       setFilter={(value) => {
-                        this.handleFilter(value, column.filterId || 'search')
+                        this.handleFilter(value, column.id || 'search')
                       }}
                     />
                   ) : null}

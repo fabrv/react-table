@@ -35,6 +35,9 @@ var TableComponent = /*#__PURE__*/function (_Component) {
 
     _this = _Component.call(this, props) || this;
     _this.filterValues = {};
+    _this.state = {
+      sortValues: {}
+    };
     _this.columns = _this.columnsObject(_this.props.columns, _this.props.data);
     _this.pages = typeof _this.props.pages === 'number' ? _this.props.pages : 0;
     _this.handleFilter = _this.handleFilter.bind(_assertThisInitialized(_this));
@@ -109,6 +112,23 @@ var TableComponent = /*#__PURE__*/function (_Component) {
     }
   };
 
+  _proto.handleSort = function handleSort(id) {
+    var _this$state$sortValue;
+
+    var val = (_this$state$sortValue = this.state.sortValues[id]) === null || _this$state$sortValue === void 0 ? void 0 : _this$state$sortValue.value;
+    var sortValue = {};
+    sortValue[id] = {
+      value: val ? (val + 1) % 3 : 1
+    };
+    this.setState({
+      sortValues: sortValue
+    });
+
+    if (this.props.onSortChange) {
+      this.props.onSortChange(sortValue);
+    }
+  };
+
   _proto.render = function render() {
     var _this2 = this;
 
@@ -116,15 +136,24 @@ var TableComponent = /*#__PURE__*/function (_Component) {
       className: this.props.className,
       style: this.props.style
     }, /*#__PURE__*/React__default.createElement("thead", null, /*#__PURE__*/React__default.createElement("tr", null, this.columns.map(function (column, index) {
+      var _this2$state$sortValu, _this2$state$sortValu2;
+
       return /*#__PURE__*/React__default.createElement("th", {
         onClick: function onClick(e) {
-          return _this2.handleCellClick(0, index, column.caption, e.target);
+          _this2.handleCellClick(0, index, column.caption, e.target);
         },
         key: index,
         scope: "col"
-      }, column.caption, column.filterComponent ? /*#__PURE__*/React__default.createElement(column.filterComponent, {
+      }, /*#__PURE__*/React__default.createElement("span", {
+        onClick: function onClick(_) {
+          if (column.sortable) _this2.handleSort(column.id);
+        },
+        style: column.sortable ? {
+          cursor: 'pointer'
+        } : null
+      }, column.caption), ((_this2$state$sortValu = _this2.state.sortValues[column.id]) === null || _this2$state$sortValu === void 0 ? void 0 : _this2$state$sortValu.value) === 1 ? ' ▴' : null, ((_this2$state$sortValu2 = _this2.state.sortValues[column.id]) === null || _this2$state$sortValu2 === void 0 ? void 0 : _this2$state$sortValu2.value) === 2 ? ' ▾' : null, column.filterComponent ? /*#__PURE__*/React__default.createElement(column.filterComponent, {
         setFilter: function setFilter(value) {
-          _this2.handleFilter(value, column.filterId || 'search');
+          _this2.handleFilter(value, column.id || 'search');
         }
       }) : null);
     }))), /*#__PURE__*/React__default.createElement("tbody", null, this.props.data.map(function (val) {

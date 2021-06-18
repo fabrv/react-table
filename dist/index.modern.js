@@ -4,6 +4,9 @@ class TableComponent extends Component {
   constructor(props) {
     super(props);
     this.filterValues = {};
+    this.state = {
+      sortValues: {}
+    };
     this.columns = this.columnsObject(this.props.columns, this.props.data);
     this.pages = typeof this.props.pages === 'number' ? this.props.pages : 0;
     this.handleFilter = this.handleFilter.bind(this);
@@ -73,19 +76,49 @@ class TableComponent extends Component {
     }
   }
 
+  handleSort(id) {
+    var _this$state$sortValue;
+
+    const val = (_this$state$sortValue = this.state.sortValues[id]) === null || _this$state$sortValue === void 0 ? void 0 : _this$state$sortValue.value;
+    const sortValue = {};
+    sortValue[id] = {
+      value: val ? (val + 1) % 3 : 1
+    };
+    this.setState({
+      sortValues: sortValue
+    });
+
+    if (this.props.onSortChange) {
+      this.props.onSortChange(sortValue);
+    }
+  }
+
   render() {
     return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("table", {
       className: this.props.className,
       style: this.props.style
-    }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, this.columns.map((column, index) => /*#__PURE__*/React.createElement("th", {
-      onClick: e => this.handleCellClick(0, index, column.caption, e.target),
-      key: index,
-      scope: "col"
-    }, column.caption, column.filterComponent ? /*#__PURE__*/React.createElement(column.filterComponent, {
-      setFilter: value => {
-        this.handleFilter(value, column.filterId || 'search');
-      }
-    }) : null)))), /*#__PURE__*/React.createElement("tbody", null, this.props.data.map(val => Object.values(val)).map((row, rIndex) => /*#__PURE__*/React.createElement("tr", {
+    }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, this.columns.map((column, index) => {
+      var _this$state$sortValue2, _this$state$sortValue3;
+
+      return /*#__PURE__*/React.createElement("th", {
+        onClick: e => {
+          this.handleCellClick(0, index, column.caption, e.target);
+        },
+        key: index,
+        scope: "col"
+      }, /*#__PURE__*/React.createElement("span", {
+        onClick: _ => {
+          if (column.sortable) this.handleSort(column.id);
+        },
+        style: column.sortable ? {
+          cursor: 'pointer'
+        } : null
+      }, column.caption), ((_this$state$sortValue2 = this.state.sortValues[column.id]) === null || _this$state$sortValue2 === void 0 ? void 0 : _this$state$sortValue2.value) === 1 ? ' ▴' : null, ((_this$state$sortValue3 = this.state.sortValues[column.id]) === null || _this$state$sortValue3 === void 0 ? void 0 : _this$state$sortValue3.value) === 2 ? ' ▾' : null, column.filterComponent ? /*#__PURE__*/React.createElement(column.filterComponent, {
+        setFilter: value => {
+          this.handleFilter(value, column.id || 'search');
+        }
+      }) : null);
+    }))), /*#__PURE__*/React.createElement("tbody", null, this.props.data.map(val => Object.values(val)).map((row, rIndex) => /*#__PURE__*/React.createElement("tr", {
       key: rIndex
     }, row.map((cell, cIndex) => /*#__PURE__*/React.createElement("td", {
       onClick: e => this.handleCellClick(rIndex, cIndex, cell, e.target),

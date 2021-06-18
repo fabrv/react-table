@@ -71,19 +71,21 @@ export default class TestComponent extends Component {
   ]
   columns = [
     {
-      caption: 'id',
+      caption: 'ID',
       filterComponent: textFilter,
-      filterId: 'id'
+      id: 'id',
+      sortable: true
     },
     {
       caption: 'Name',
       filterComponent: textFilter,
-      filterId: 'name'
+      id: 'name',
+      sortable: true
     },
     {
       caption: 'Nationality',
       filterComponent: (props) => selectFilter(props, this.data.map(a => a.nationality).filter((v, i, a) => a.indexOf(v) === i)),
-      filterId: 'nationality'
+      id: 'nationality'
     }
   ]
   
@@ -126,7 +128,33 @@ export default class TestComponent extends Component {
     })
 
     this.setState({
-      data: data
+      data: data,
+      page: 1
+    })
+  }
+
+  sort(e) {
+    const key = Object.keys(e)[0]
+    const sortValue = e[key].value
+    
+    const data = sortValue === 0 
+      ? [...this.data] 
+      : [...this.data].sort((a, b) => {
+        var nameA = a[key].toUpperCase()
+        var nameB = b[key].toUpperCase()
+        if (nameA < nameB) {
+          return sortValue === 1 ? -1 : 1;
+        }
+        if (nameA > nameB) {
+          return sortValue === 1 ? 1 : -1
+        }
+
+        return 0
+      })
+
+    this.setState({
+      data: data,
+      page: 1
     })
   }
 
@@ -139,6 +167,7 @@ export default class TestComponent extends Component {
         onPreviousPageClick={() => this.previousPage()}
         onPageClick={(e) => this.pageChange(e)}
         onFilterChange={(e) => this.filter(e)}
+        onSortChange={(e) => this.sort(e)}
         className='table' 
         data={this.state.data.slice((this.state.page - 1) * 3, (this.state.page - 1) * 3 + 3)}
         columns={this.columns}
